@@ -26,6 +26,10 @@ try:
 	from ispConfig import usePtMPasParent
 except:
 	usePtMPasParent = False
+try:
+	from ispConfig import uisp_use_burst
+except:
+	uisp_use_burst = False
 
 def uispRequest(target):
 	# Sends an HTTP request to UISP and returns the
@@ -65,6 +69,10 @@ def buildFlatGraph():
 			if (site['qos']['downloadSpeed']) and (site['qos']['uploadSpeed']):
 				download = int(round(site['qos']['downloadSpeed']/1000000))
 				upload = int(round(site['qos']['uploadSpeed']/1000000))
+				if uisp_use_burst:
+					if (site['qos']['downloadBurstSize']) and (site['qos']['uploadBurstSize']):
+						download += int(round(site['qos']['downloadBurstSize']/1000000/1.024))
+						upload += int(round(site['qos']['uploadBurstSize']/1000000/1.024))
 			if site['identification'] is not None and site['identification']['suspended'] is not None and site['identification']['suspended'] == True:
 				if uispSuspendedStrategy == "ignore":
 					print("WARNING: Site " + name + " is suspended")
@@ -478,6 +486,10 @@ def buildFullGraph():
 				if (site['qos']['downloadSpeed']) and (site['qos']['uploadSpeed']):
 					download = int(round(site['qos']['downloadSpeed']/1000000))
 					upload = int(round(site['qos']['uploadSpeed']/1000000))
+					if uisp_use_burst:
+						if (site['qos']['downloadBurstSize']) and (site['qos']['uploadBurstSize']):
+							download += int(round(site['qos']['downloadBurstSize']/1000000/1.024))
+							upload += int(round(site['qos']['uploadBurstSize']/1000000/1.024))
 				if site['identification'] is not None and site['identification']['suspended'] is not None and site['identification']['suspended'] == True:
 					if uispSuspendedStrategy == "ignore":
 						print("WARNING: Site " + name + " is suspended")
