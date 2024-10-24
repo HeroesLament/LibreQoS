@@ -13,6 +13,7 @@ base-deps:
     RUN apt-get update && \
         apt-get install -y \
         # Non *-dev packages
+        bpftool \
         build-essential \
         clang \
         cmake \
