@@ -19,6 +19,7 @@ base-deps:
         curl \
         git \
         graphviz \
+        llvn \
         mold \
         nano \
         pkg-config \
