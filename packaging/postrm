@@ -1,0 +1,4 @@
+#!/bin/bash
+/bin/systemctl stop lqosd
+/bin/systemctl stop lqos_scheduler
+/bin/systemctl disable lqosd lqos_scheduler

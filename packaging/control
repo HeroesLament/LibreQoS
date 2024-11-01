@@ -1,0 +1,6 @@
+Package: libreqos
+Version: 1.0-1
+Architecture: amd64
+Maintainer: Herbert Wolverson <herberticus@gmail.com>
+Description: CAKE-based traffic shaping for ISPs
+Depends: python3-pip, graphviz
