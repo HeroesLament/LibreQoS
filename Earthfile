@@ -22,7 +22,6 @@ base-deps:
         graphviz \
         llvm \
         mold \
-        nano \
         pkg-config \
         python3-pip \
         # *-dev packages
