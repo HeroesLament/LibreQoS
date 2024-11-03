@@ -1,0 +1,22 @@
+#!/bin/bash
+# Install Python Dependencies
+pushd /opt/libreqos || exit
+
+# Setup Python dependencies as a post-install task
+python3 -m pip install --break-system-packages -r src/requirements.txt
+sudo python3 -m pip install --break-system-packages -r src/requirements.txt
+
+# Run lqsetup
+/opt/libreqos/src/bin/lqos_setup
+
+# Setup the services
+cp /opt/libreqos/src/bin/lqosd.service.example /etc/systemd/system/lqosd.service
+cp /opt/libreqos/src/bin/lqos_scheduler.service.example /etc/systemd/system/lqos_scheduler.service
+/bin/systemctl daemon-reload
+/bin/systemctl stop lqos_node_manager
+/bin/systemctl disable lqos_node_manager
+/bin/systemctl enable lqosd lqos_scheduler
+/bin/systemctl start lqosd
+/bin/systemctl start lqos_scheduler
+
+popd || exit

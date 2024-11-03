@@ -125,3 +125,6 @@ src/rust/lqosd/src/node_manager/js_build/out
 src/bin/dashboards
 
 target/
+artifacts/
+
+Cargo.lock
