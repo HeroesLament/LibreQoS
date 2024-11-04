@@ -1,5 +1,7 @@
+
 from pythonCheck import checkPythonVersion
 checkPythonVersion()
+
 import requests
 import warnings
 import os
@@ -9,15 +11,19 @@ from liblqos_python import exclude_sites, find_ipv6_using_mikrotik, bandwidth_ov
 from integrationCommon import isIpv4Permitted
 import base64
 from requests.auth import HTTPBasicAuth
-if find_ipv6_using_mikrotik() == True:
-	from mikrotikFindIPv6 import pullMikrotikIPv6  
+
+if findIPv6usingMikrotik:
+    from mikrotikFindIPv6 import pullMikrotikIPv6
+
 from integrationCommon import NetworkGraph, NetworkNode, NodeType
+import os
+import csv
 
 def buildHeaders():
     """
     Build authorization headers for Splynx API requests using API key and secret.
     """
-    credentials = splynx_api_key() + ':' + splynx_api_secret()
+    credentials = splynx_api_key + ':' + splynx_api_secret
     credentials = base64.b64encode(credentials.encode()).decode()
     return {'Authorization': "Basic %s" % credentials}
 
@@ -25,7 +31,7 @@ def spylnxRequest(target, headers):
     """
     Send a GET request to the Splynx API and return the JSON response.
     """
-    url = splynx_api_url() + "/api/2.0/" + target
+    url = splynx_api_url + "/api/2.0/" + target
     r = requests.get(url, headers=headers, timeout=120)
     return r.json()
 

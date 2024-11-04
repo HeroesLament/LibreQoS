@@ -46,15 +46,16 @@ def buildFlatGraph():
 				download = int(round(site['qos']['downloadSpeed']/1000000))
 				upload = int(round(site['qos']['uploadSpeed']/1000000))
 			if site['identification'] is not None and site['identification']['suspended'] is not None and site['identification']['suspended'] == True:
-				if uisp_suspended_strategy() == "ignore":
+				if uispSuspendedStrategy == "ignore":
 					print("WARNING: Site " + name + " is suspended")
 					continue
-				if uisp_suspended_strategy() == "slow":
+				if uispSuspendedStrategy == "slow":
 					print("WARNING: Site " + name + " is suspended")
-					download = 1
-					upload = 1
+					download = 2
+					upload = 2
 			if site['identification']['status'] == "disconnected":
 				print("WARNING: Site " + name + " is disconnected")
+
 			node = NetworkNode(id=id, displayName=name, type=NodeType.client, download=download, upload=upload, address=address, customerName=customerName)
 			net.addRawNode(node)
 			for device in devices:
@@ -299,11 +300,12 @@ def loadRoutingOverrides():
 
 def findNodesBranchedOffPtMP(siteList, dataLinks, sites, rootSite, foundAirFibersBySite):
 	nodeOffPtMP = {}
-	if use_ptmp_as_parent():
+	if usePtMPasParent:
 		for site in siteList:
 			id = site['id']
 			name = site['name']
 			if id != rootSite['id']:
+				
 				if id not in foundAirFibersBySite:
 					trueParent = findInSiteListById(siteList, id)['parent']
 					#parent = findInSiteListById(siteList, id)['parent']
@@ -343,7 +345,7 @@ def findNodesBranchedOffPtMP(siteList, dataLinks, sites, rootSite, foundAirFiber
 																				'upload': upload,
 																				parent: apID
 																				}
-																	if use_ptmp_as_parent():
+																	if usePtMPasParent:
 																		site['parent'] = apID
 																		print('Site ' + name + ' will use PtMP AP ' + link['from']['device']['identification']['name'] + ' as parent from site ' + link['from']['site']['identification']['name'])
 	return siteList, nodeOffPtMP
@@ -473,8 +475,8 @@ def buildFullGraph():
 						continue
 					if uisp_suspended_strategy() == "slow":
 						print("WARNING: Site " + name + " is suspended")
-						download = 1
-						upload = 1
+						download = 2
+						upload = 2
 
 				if site['identification']['status'] == "disconnected":
 					print("WARNING: Site " + name + " is disconnected")
