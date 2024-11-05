@@ -121,3 +121,8 @@ src/network.pdf
 src/ShapedDevices.csv.good
 .gitignore
 src/rust/lqosd/lts_keys.bin
+
+target/
+artifacts/
+
+Cargo.lock

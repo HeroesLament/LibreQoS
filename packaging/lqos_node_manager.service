@@ -1,0 +1,14 @@
+[Unit]
+Description=LQoS Node Manager
+After=network-online.target lqosd.service
+Wants=network-online.target lqosd.service
+
+[Service]
+WorkingDirectory=/opt/libreqos/src/bin
+ExecStart=/opt/libreqos/src/bin/lqos_node_manager
+Restart=on-failure
+RestartSec=5
+Environment=RUST_LOG=info
+
+[Install]
+WantedBy=multi-user.target
