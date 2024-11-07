@@ -1,5 +1,5 @@
 Package: libreqos
-Version: 1.0-1
+Version: 1.4.1
 Architecture: amd64
 Maintainer: Herbert Wolverson <herberticus@gmail.com>
 Description: CAKE-based traffic shaping for ISPs

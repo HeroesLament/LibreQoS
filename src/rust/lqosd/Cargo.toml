@@ -25,7 +25,7 @@ serde = { version = "1.0", features = ["derive"] }
 env_logger = "0"
 log = "0"
 nix = "0"
-sysinfo = "0"
+sysinfo = "0.29.11"
 dashmap = "5"
 num-traits = "0.2"
 thiserror = "1"

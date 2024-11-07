@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Define global packaging variables
 ARG PACKAGE_NAME="libreqos"
-ARG PACKAGE_VERSION="1.5.3.1"
+ARG PACKAGE_VERSION="1.4.1"
 ARG ARCHITECTURE="amd64"
 
 # Map ARG to ENV for access in all build stages
@@ -14,6 +14,7 @@ ENV PACKAGE_VERSION=$PACKAGE_VERSION
 ENV ARCHITECTURE=$ARCHITECTURE
 ENV DPKG_DIR="dist/${PACKAGE_NAME}_${PACKAGE_VERSION}_${ARCHITECTURE}"
 ENV LQOS_DIR="${DPKG_DIR}/opt/libreqos/src"
+ENV LQOS_EXAMPLE_DIR="${LQOS_DIR}/bin/"
 ENV DEBIAN_DIR="${DPKG_DIR}/DEBIAN"
 ENV SERVICE_DIR_PATH="${DPKG_DIR}/etc/systemd/system"
 
@@ -36,6 +37,7 @@ base-deps:
         pkg-config \
         python3-pip \
         python3-venv \
+        tree \
         libbpf-dev \
         libclang-dev \
         libc6-dev-i386 \
@@ -188,29 +190,48 @@ package-deb:
     # Move liblqos_python.so to the correct directory
     RUN mv $LQOS_DIR/bin/liblqos_python.so $LQOS_DIR/
 
-    # Copy files listed in packaging/filelist to appropriate directories
-    RUN mkdir -p $LQOS_DIR $SERVICE_DIR_PATH && \
+    RUN mkdir -p $LQOS_DIR $SERVICE_DIR_PATH $LQOS_EXAMPLE_DIR && \
         while IFS= read -r entry; do \
             target=$(echo "$entry" | cut -d':' -f1); \
             file=$(echo "$entry" | cut -d':' -f2); \
+            echo "Processing: target=$target, file=$file"; \
             if [ "$target" = "src" ]; then \
                 cp "$file" "$LQOS_DIR"; \
+                echo "$(ls -la ${LQOS_DIR})"; \
             elif [ "$target" = "svc" ]; then \
                 cp "$file" "$SERVICE_DIR_PATH"; \
+                echo "$(ls -la ${SERVICE_DIR_PATH})"; \
+            elif [ "$target" = "example" ]; then \
+                echo "Attempting to copy example file: $file"; \
+                if [ -f "$file" ]; then \
+                    cp "$file" "$LQOS_EXAMPLE_DIR"; \
+                    echo "Copied to ${LQOS_EXAMPLE_DIR}"; \
+                else \
+                    echo "File not found: $file"; \
+                fi; \
+                echo "$(ls -la ${LQOS_EXAMPLE_DIR})"; \
+            else \
+                echo "Unknown target: $target"; \
             fi; \
         done < ../packaging/filelist
 
-    # Compile the website and copy the web resources
-    RUN mkdir -p bin/static2 && \
-        cd rust/lqosd && \
-        ./copy_files.sh && \
-        cd - && \
-        cp -r bin/static2/* $LQOS_DIR/bin/static2
+
+    # Copy web resources
+    RUN mkdir -p $LQOS_DIR/bin && \
+        cp rust/lqos_node_manager/Rocket.toml $LQOS_DIR/bin && \
+        mkdir -p $LQOS_DIR/bin/static && \
+        cp -R rust/lqos_node_manager/static/* $LQOS_DIR/bin/static && \
+        # Debugging: list the contents of the target directory
+        ls -la $LQOS_DIR/bin/static
+
+    # Debugging: print the tree of the DPKG_DIR
+    RUN echo "Directory tree of $DPKG_DIR:" && \
+        tree $DPKG_DIR
 
     # Final assembly into Debian package
     RUN echo "Building .deb package in $DPKG_DIR" && \
         ls -la $DPKG_DIR && \
-        dpkg-deb --root-owner-group --build "$DPKG_DIR"
+        dpkg-deb --root-owner-group --verbose --build "$DPKG_DIR"
 
 # Target to copy the output artifacts to a local artifacts directory
 copy-artifacts:
@@ -222,6 +243,24 @@ copy-artifacts:
 
     # Save the built .deb package as a local artifact using variables
     SAVE ARTIFACT $(cat /tmp/deb_path.txt) AS LOCAL artifacts/
+
+# Target to push .deb to staging server and install locally
+push-staging:
+    # Run the dev pipeline to test, build, and package
+    BUILD +ci-pipeline
+
+    # Use a more complete base image with SCP and SSH for deployment
+    FROM ubuntu:latest
+    WORKDIR /app
+
+    # Install necessary tools for deployment
+    RUN apt-get update && \
+        apt-get install -y openssh-client
+
+    COPY artifacts/libreqos_1.4.1_amd64.deb /app/
+
+    # Use SCP to copy the .deb package to the remote staging server
+    RUN scp /app/libreqos_1.4.1_amd64.deb mwynkoop@172.23.0.6:/tmp/
 
 # Pipeline to run the full Rust build process
 ci-pipeline:

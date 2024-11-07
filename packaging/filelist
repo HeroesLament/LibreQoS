@@ -3,9 +3,7 @@ svc:../packaging/lqos_node_manager.service
 src:graphInfluxDB.py
 src:influxDBdashboardTemplate.json
 src:integrationCommon.py
-src:integrationPowercode.py
 src:integrationRestHttp.py
-src:integrationSonar.py
 src:integrationSplynx.py
 src:integrationUISP.py
 src:LibreQoS.py
@@ -13,3 +11,6 @@ src:lqTools.py
 src:mikrotikFindIPv6.py
 src:pythonCheck.py
 src:scheduler.py
+src:../packaging/ispConfig.example.py
+example:../packaging/lqosd.service.example
+example:../packaging/lqos_scheduler.service.example
