@@ -24,7 +24,7 @@ use lqos_queue_tracker::{
   spawn_queue_structure_monitor,
 };
 use lqos_sys::LibreQoSKernels;
-use lts_client::collector::start_long_term_stats;
+// use lts_client::collector::start_long_term_stats;
 use signal_hook::{
   consts::{SIGHUP, SIGINT, SIGTERM},
   iterator::Signals,
@@ -73,14 +73,14 @@ async fn main() -> Result<()> {
   };
 
   // Spawn tracking sub-systems
-  let long_term_stats_tx = start_long_term_stats().await;
+  // let long_term_stats_tx = start_long_term_stats().await;
   join!(
     start_heimdall(),
     spawn_queue_structure_monitor(),
     shaped_devices_tracker::shaped_devices_watcher(),
     shaped_devices_tracker::network_json_watcher(),
-    anonymous_usage::start_anonymous_usage(),
-    throughput_tracker::spawn_throughput_monitor(long_term_stats_tx.clone()),
+    anonymous_usage::start_anonymous_usage()
+    // throughput_tracker::spawn_throughput_monitor(long_term_stats_tx.clone()),
   );
   spawn_queue_monitor();
 
@@ -97,9 +97,9 @@ async fn main() -> Result<()> {
               warn!("This should never happen - terminating on unknown signal")
             }
           }
-          let _ = tokio::runtime::Runtime::new()
-            .unwrap()
-            .block_on(long_term_stats_tx.send(lts_client::collector::StatsUpdateMessage::Quit));
+          // let _ = tokio::runtime::Runtime::new()
+          //   .unwrap()
+          //   .block_on(long_term_stats_tx.send(lts_client::collector::StatsUpdateMessage::Quit));
           std::mem::drop(kernels);
           UnixSocketServer::signal_cleanup();
           std::mem::drop(file_lock);

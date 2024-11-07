@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Define global packaging variables
 ARG PACKAGE_NAME="libreqos"
-ARG PACKAGE_VERSION="1.4.1"
+ARG PACKAGE_VERSION="1.4.2"
 ARG ARCHITECTURE="amd64"
 
 # Map ARG to ENV for access in all build stages
